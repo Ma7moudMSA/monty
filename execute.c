@@ -37,19 +37,15 @@ int execute(char *content, stack_t **stack, unsigned int counter, FILE *file)
 	while (opst[i].opcode && op)
 	{
 		if (strcmp(op, opst[i].opcode) == 0)
-		{
-			opst[i].f(stack, counter);
-			return (0);
-		}
+		{ opst[i].f(stack, counter);
+			return (0); }
 		i++;
 	}
 	if (op && opst[i].opcode == NULL)
-	{
-		fprintf(stderr, "L%d: unknown instruction %s\n", counter, op);
+	{ fprintf(stderr, "L%d: unknown instruction %s\n", counter, op);
 		fclose(file);
 		free(content);
 		free_stack(*stack);
-		exit(EXIT_FAILURE);
-		}
+		exit(EXIT_FAILURE); }
 	return (1);
 }
