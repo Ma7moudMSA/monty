@@ -1,97 +1,114 @@
 #include "monty.h"
-
 /**
- * nop - Does nothing.
- * @stack: Pointer to a pointer pointing to top node of the stack.
- * @line_number: Interger representing the line number of of the opcode.
+ * _swap - swap top of stack y second top stack
+ * @stack: pointer to lists for monty stack
+ * @line_number: number of line opcode occurs on
  */
-void nop(stack_t **stack, unsigned int line_number)
+
+void _swap(stack_t **stack, unsigned int line_number)
 {
-	(void)stack;
-	(void)line_number;
-}
+	stack_t *runner;
+	int tmp;
 
-
-/**
- * swap_nodes - Swaps the top two elements of the stack.
- * @stack: Pointer to a pointer pointing to top node of the stack.
- * @line_number: Interger representing the line number of of the opcode.
- */
-void swap_nodes(stack_t **stack, unsigned int line_number)
-{
-	stack_t *tmp;
-
-	if (stack == NULL || *stack == NULL || (*stack)->next == NULL)
-		more_err(8, line_number, "swap");
-	tmp = (*stack)->next;
-	(*stack)->next = tmp->next;
-	if (tmp->next != NULL)
-		tmp->next->prev = *stack;
-	tmp->next = *stack;
-	(*stack)->prev = tmp;
-	tmp->prev = NULL;
-	*stack = tmp;
+	runner = *stack;
+	if (runner == NULL || runner->next == NULL)
+	{
+		fprintf(stderr, "L%d: can't swap, stack too short\n", line_number);
+		exit(EXIT_FAILURE);
+	}
+	tmp = runner->n;
+	runner->n = runner->next->n;
+	runner->next->n = tmp;
 }
 
 /**
- * add_nodes - Adds the top two elements of the stack.
- * @stack: Pointer to a pointer pointing to top node of the stack.
- * @line_number: Interger representing the line number of of the opcode.
+ * _add - add top of stack y second top stack
+ * @stack: pointer to lists for monty stack
+ * @line_number: number of line opcode occurs on
  */
-void add_nodes(stack_t **stack, unsigned int line_number)
+
+void _add(stack_t **stack, unsigned int line_number)
 {
-	int sum;
+	stack_t *tmp = *stack;
+	int sum = 0, i = 0;
 
-	if (stack == NULL || *stack == NULL || (*stack)->next == NULL)
-		more_err(8, line_number, "add");
+	if (tmp == NULL)
+	{
+		fprintf(stderr, "L%d: can't add, stack too short\n", line_number);
+		exit(EXIT_FAILURE);
+	}
 
-	(*stack) = (*stack)->next;
-	sum = (*stack)->n + (*stack)->prev->n;
+	while (tmp)
+	{
+		tmp = tmp->next;
+		i++;
+	}
+
+	if (stack == NULL || (*stack)->next == NULL || i <= 1)
+	{
+		fprintf(stderr, "L%d: can't add, stack too short\n", line_number);
+		exit(EXIT_FAILURE);
+	}
+	sum = (*stack)->next->n + (*stack)->n;
+	_pop(stack, line_number);
+
 	(*stack)->n = sum;
-	free((*stack)->prev);
-	(*stack)->prev = NULL;
 }
 
-
 /**
- * sub_nodes - Adds the top two elements of the stack.
- * @stack: Pointer to a pointer pointing to top node of the stack.
- * @line_number: Interger representing the line number of of the opcode.
+ * _nop - nop top of stack y second top stack
+ * @stack: pointer to lists for monty stack
+ * @line_number: number of line opcode occurs on
  */
-void sub_nodes(stack_t **stack, unsigned int line_number)
+
+void _nop(__attribute__ ((unused))stack_t **stack,
+		__attribute__ ((unused)) unsigned int line_number)
 {
-	int sum;
-
-	if (stack == NULL || *stack == NULL || (*stack)->next == NULL)
-
-		more_err(8, line_number, "sub");
-
-
-	(*stack) = (*stack)->next;
-	sum = (*stack)->n - (*stack)->prev->n;
-	(*stack)->n = sum;
-	free((*stack)->prev);
-	(*stack)->prev = NULL;
+	;
 }
 
+/**
+ * _pchar - prints the ASCII value of a number
+ * @stack: pointer to the top of the stack
+ * @line_number: the index of the current line
+ *
+ */
+void _pchar(stack_t **stack, unsigned int line_number)
+{
+	int val;
+
+	if (stack == NULL || *stack == NULL)
+	{
+		fprintf(stderr, "L%d: can't pchar, stack empty\n", line_number);
+		free(var_global.buffer);
+		fclose(var_global.file);
+		free_dlistint(*stack);
+		exit(EXIT_FAILURE);
+	}
+
+	val = (*stack)->n;
+	if (val > 127 || val < 0)
+	{
+		fprintf(stderr, "L%d: can't pchar, value out of range\n", line_number);
+		free(var_global.buffer);
+		fclose(var_global.file);
+		free_dlistint(*stack);
+		exit(EXIT_FAILURE);
+	}
+
+	putchar(val);
+	putchar('\n');
+}
 
 /**
- * div_nodes - Adds the top two elements of the stack.
- * @stack: Pointer to a pointer pointing to top node of the stack.
- * @line_number: Interger representing the line number of of the opcode.
+ * _isalpha - checks if int is in alphabet
+ * @c: int
+ * Return: 1 if yes, 0 if no
  */
-void div_nodes(stack_t **stack, unsigned int line_number)
+int _isalpha(int c)
 {
-	int sum;
-
-	if (stack == NULL || *stack == NULL || (*stack)->next == NULL)
-		more_err(8, line_number, "div");
-
-	if ((*stack)->n == 0)
-		more_err(9, line_number);
-	(*stack) = (*stack)->next;
-	sum = (*stack)->n / (*stack)->prev->n;
-	(*stack)->n = sum;
-	free((*stack)->prev);
-	(*stack)->prev = NULL;
+	if ((c >= 97 && c <= 122) || (c >= 65 && c <= 90))
+		return (1);
+	else
+		return (0);
 }
